@@ -11,7 +11,7 @@
 <body>
     <div id="lead">
         <h1>
-            RPCCC Deep Learning Automatic Contour Generation Tool - created and maintained by Dr Le's research group
+            Deep Learning Head and Neck Automatic Contour Generation Tool
         </h1>
     </div>
     {% with messages = get_flashed_messages() %}
@@ -26,11 +26,11 @@
     <div id="content">{% block content %}{% endblock %}</div>
     <div id="footer">
         {% block footer %}
-        <p>
-            <img src={{ url_for('static',filename='roswell_logo.jpg') }} alt="RPCCC Logo" style="width:200px;border:1px solid blue;" />
-        </p>
         <p style="font-size:12px">
             Neural network implementation using Python 3.7 - open source deep learning packages TensorFlow/Keras used to facilitate.
+        </p></n></n>
+        <p>
+            NOT FOR PRODUCTION USE
         </p>
         {% endblock %}
     </div>

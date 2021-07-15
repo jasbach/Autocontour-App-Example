@@ -334,12 +334,6 @@ def create_dicom(patient_data, UIDdict, structuresetdata,image_size=256,threshol
         roi_contour.ReferencedROINumber = i
         roi_contour_sequence.append(roi_contour)
     
-    
-    """
-    BLOCK BELOW NEEDS TO BE BUILT INTO A FOR LOOP
-    """
-    
-    
     # RT ROI Observations Sequence
     rtroi_observations_sequence = Sequence()
     ds.RTROIObservationsSequence = rtroi_observations_sequence

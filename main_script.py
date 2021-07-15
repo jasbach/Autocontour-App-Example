@@ -60,34 +60,16 @@ def generate_ss(imagefolder,outputfolder,username):
     
     AxialInput = np.copy(inputarray)
     
-    """
-    commenting out mock-3D approach, processing time is too long by a lot.
-    would love to revisit 3D approaches in the future but will require more elegance
-    
-    original_size = len(AxialInput)
-    CoronalInput = np.copy(inputarray)
-    if len(CoronalInput) > image_size:
-        CoronalInput = CoronalInput[:image_size]
-    CoronalInput = image_prep.vertical_pad(CoronalInput,image_size)
-    CoronalInput = np.moveaxis(CoronalInput,1,0)
-    SagittalInput = np.copy(inputarray)
-    if len(SagittalInput) > image_size:
-        SagittalInput = SagittalInput[:image_size]
-    SagittalInput = image_prep.vertical_pad(SagittalInput,image_size)
-    SagittalInput = np.moveaxis(SagittalInput,2,0)
-    """    
-    
+
     for ROI in ROIlist:
         print("Beginning work on",ROI)
         threshold = thresholds[ROI]
         
         axialweightspath = os.path.join(weightspaths["Axial"], ROI)
-        #coronalweightspath = os.path.join(weightspaths["Coronal"], ROI)
-        #sagittalweightspath = os.path.join(weightspaths["Sagittal"], ROI)
+
         
         AxialModel.load_weights(os.path.join(axialweightspath,os.listdir(axialweightspath)[0]))
-        #CoronalModel.load_weights(os.path.join(coronalweightspath,os.listdir(coronalweightspath)[0]))
-        #SagittalModel.load_weights(os.path.join(sagittalweightspath,os.listdir(sagittalweightspath)[0]))
+
         
         if ROI == "BrachialPlexus" or ROI == "SpinalCord": #this is the spot to edit if we want to change how filters are applied
             win_lev = "Bone"
@@ -96,32 +78,17 @@ def generate_ss(imagefolder,outputfolder,username):
         
         if win_lev == "Tissue":
             filtAxialInput = image_prep.apply_window_level(AxialInput,filters["tissue"][0],filters["tissue"][1])
-            #filtCoronalInput = image_prep.apply_window_level(CoronalInput,filters["tissue"][0],filters["tissue"][1])
-            #filtSagittalInput = image_prep.apply_window_level(SagittalInput,filters["tissue"][0],filters["tissue"][1])
+
         elif win_lev == "Bone":
             filtAxialInput = image_prep.apply_window_level(AxialInput,filters["bone"][0],filters["bone"][1])
-            #filtCoronalInput = image_prep.apply_window_level(CoronalInput,filters["bone"][0],filters["bone"][1])
-            #filtSagittalInput = image_prep.apply_window_level(SagittalInput,filters["bone"][0],filters["bone"][1])
+
         elif win_lev == "None":
             filtAxialInput = image_prep.apply_window_level(AxialInput,filters["none"][0],filters["none"][1])
-            #filtCoronalInput = image_prep.apply_window_level(CoronalInput,filters["none"][0],filters["none"][1])
-            #filtSagittalInput = image_prep.apply_window_level(SagittalInput,filters["none"][0],filters["none"][1])
+
         
         AxialOutput = AxialModel.predict(filtAxialInput,verbose=0)
         
-        """
-        CoronalOutput = CoronalModel.predict(filtCoronalInput,verbose=0)
-        SagittalOutput = SagittalModel.predict(filtSagittalInput,verbose=0)
-        
-        CoronalOutput = np.moveaxis(CoronalOutput,0,1)
-        SagittalOutput = np.moveaxis(SagittalOutput,0,2)
-        
-        CoronalOutput = image_prep.unpad(CoronalOutput,original_size)
-        SagittalOutput = image_prep.unpad(SagittalOutput,original_size)
-        
-        combinedoutput = AxialOutput*0.5 + CoronalOutput*0.25 + SagittalOutput*0.25
-        """
-        
+
         structuresetdata.append([ROI,AxialOutput,heightlist]) #if returning to 3D, change AxialOutput to combinedoutput
         
     patient_data,UIDdict = createdicomfile.gather_patient_data(imagefolder)

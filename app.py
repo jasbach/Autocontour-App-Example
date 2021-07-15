@@ -4,9 +4,11 @@ Created on Sun Nov  8 14:56:15 2020
 
 @author: johna
 
-PowerShell Prompt
-Navigate to C:/Apache24/htdocs
-$env:FLASK_APP="firstflaskapp.py"
+To run on local server (not production level):
+Open Anaconda PowerShell Prompt
+Navigate to folder containing the app
+
+$env:FLASK_APP="app.py"
 flask run --without-threads
 """
 
@@ -47,6 +49,9 @@ def user_redirect():
         app.config['USERNAME'] = request.form['username']
         app.config['UPLOAD_FOLDER'] = os.path.join(UPLOAD_FOLDER,app.config['USERNAME'])
         app.config['OUTPUT_FOLDER'] = os.path.join(OUTPUT_FOLDER,app.config['USERNAME'])
+        print("Username:",app.config['USERNAME'])
+        print("Input Path:",app.config['UPLOAD_FOLDER'])
+        print("Output Path:",app.config['OUTPUT_FOLDER'])
         if request.form['process'] == "new":
             return redirect(url_for('upload_files',username=app.config['USERNAME']))
         elif request.form['process'] == "last":
@@ -59,9 +64,8 @@ def user_redirect():
 @app.route('/<username>/retrieve_ss', methods=['GET','POST'])
 def retrieve_ss(username):
     filename = app.config['FILENAME']
-    yearmonthday = filename.split(".")[0].split("-")[1:]
-    date_created = yearmonthday[1] + "-" + yearmonthday[2] + "-" + yearmonthday[0]
-    return render_template('retrieve_ss.html',date_created=date_created)
+    flash('Found file {}'.format(filename))
+    return render_template('retrieve_ss.html')#,date_created=date_created)
 
 @app.route('/<username>/uploadform')
 def upload_files(username):
@@ -108,15 +112,14 @@ def contour():
             flash("%d files could not be validated as DICOM and were removed." % invalid_files)
         return render_template('upload_files.html', number_of_files=len(os.listdir(app.config['UPLOAD_FOLDER'])), uploaded=True)
     
-    return render_template('upload_files.html', number_of_files=len(os.listdir(app.config['UPLOAD_FOLDER'])), uploaded=False)
-
+    return render_template('upload_files.html', number_of_files=len(os.listdir(app.config['UPLOAD_FOLDER']), uploaded=False))
+                       
 @app.route('/create_ss',methods=['GET','POST'])
 def create_ss():
-    
     main_script.generate_ss(app.config['UPLOAD_FOLDER'],app.config['OUTPUT_FOLDER'],app.config['USERNAME'])
     filename = "RS." + app.config['USERNAME'] + "-CNN.dcm"
     app.config['FILENAME'] = filename
-    return render_template('create_ss.html', number_of_files=len(os.listdir(UPLOAD_FOLDER)))
+    return render_template('create_ss.html', number_of_files=len(os.listdir(app.config['UPLOAD_FOLDER'])))
 
 @app.route('/contour_download/', methods=['GET','POST'])
 def download_redirect():
