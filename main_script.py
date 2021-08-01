@@ -27,8 +27,6 @@ INPUT RECEIVED FROM BROWSER:
 
 def generate_ss(imagefolder,outputfolder,username):
     
-    TODAY = datetime.date.today()
-    
     thresholds = {"BrainStem":0.2, "CochleaL":0.2, "CochleaR":0.2,
                   "ParotidL":0.33, "ParotidR":0.33, "SubmandibularL":0.1,
                   "SubmandibularR":0.1,"BrachialPlexus":0.1, "Brain":0.66,
@@ -36,9 +34,6 @@ def generate_ss(imagefolder,outputfolder,username):
     
     region = "Head and Neck"
     filters = {"bone":[2000, 400], "tissue":[400,40],"none":[4500,1000]}
-    #CRITICAL THING TO LEARN
-    # how does JavaScript interact with Python to pass the image folder to the script?
-    # possible that JavaScript may need to load the files first, then pass the files themselves to Python - adjust scripts if necessary
     
     datalist = image_prep.get_list_of_datasets(imagefolder)
     inputarray, heightlist = image_prep.build_array(datalist,image_size=256,pixel_size=1)
@@ -53,8 +48,7 @@ def generate_ss(imagefolder,outputfolder,username):
     
     image_size = 256
     AxialModel = model.get_unet(image_size)
-    #CoronalModel = model.get_unet(image_size)
-    #SagittalModel = model.get_unet(image_size)
+
     
     structuresetdata = []
     
@@ -94,18 +88,7 @@ def generate_ss(imagefolder,outputfolder,username):
     patient_data,UIDdict = createdicomfile.gather_patient_data(imagefolder)
     structure_set = createdicomfile.create_dicom(patient_data,UIDdict,structuresetdata,image_size=256,threshold=threshold)
     
-    #filename = username + "_created_ss-" + str(TODAY) + ".dcm"
     filename = "RS.%s-CNN.dcm" % username
     
     structure_set.save_as(os.path.join(outputfolder, filename), write_like_original=False)
     
-if __name__ == "__main__":
-    IDlist = ["017_064","017_074","017_075","017_079","017_080","017_108","017_109",
-              "017_110","017_111","017_119","017_129","017_134","017_135","017_139",
-              "017_140","017_141","017_143","017_144","017_145"]
-    
-    for ID in IDlist:
-        imagefolder = os.path.join(r"F:\DICOMdata\RoswellData",ID)
-        outputfolder = r"F:\DICOMdata\created_dicoms"
-        username = ID
-        generate_ss(imagefolder,outputfolder,username)

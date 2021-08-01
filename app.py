@@ -10,6 +10,9 @@ Navigate to folder containing the app
 
 $env:FLASK_APP="app.py"
 flask run --without-threads
+
+
+Alternately, run this script in any Python IDE. Line 136 allows it to be run directly this way.
 """
 
 import os
